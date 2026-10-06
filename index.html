@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Experience Calbayog Kiosk</title>
+    <style>
+      :root {
+        --card: #fff;
+        --tx: #10243a;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      html {
+        scroll-padding-top: env(safe-area-inset-top, 0px);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        min-height: 100dvh;
+        background: #fff;
+        font-family: "Segoe UI", system-ui, Arial, sans-serif;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+      }
+      .kiosk {
+        width: 100%;
+        max-width: 1600px;
+        height: min(900px, 100vh);
+        height: min(900px, 100dvh);
+        min-height: 620px;
+        background: #fff;
+        border: 0;
+        padding: 0;
+        color: #111827;
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+        box-shadow: 0 0 40px rgba(15, 23, 42, 0.12);
+      }
+      .kiosk::before,
+      .kiosk::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .kiosk::before {
+        background: #ffe34d;
+        clip-path: polygon(80% 0, 100% 0, 100% 100%, 80% 100%, 60% 39%);
+        z-index: -2;
+      }
+      .kiosk::after {
+        background: #5268c9;
+        clip-path: polygon(82% 0, 100% 0, 100% 100%, 82% 100%, 62% 39%);
+        z-index: -1;
+      }
+      .brand {
+        position: absolute;
+        top: 26px;
+        left: 30px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 1;
+        color: #334155;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      .brand img {
+        width: 46px;
+        height: 46px;
+        object-fit: contain;
+      }
+      .hero-title {
+        position: absolute;
+        top: 10%;
+        right: 5%;
+        z-index: 1;
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .hero-title span {
+        color: #f34f55;
+        font-family: Georgia, "Times New Roman", serif;
+        font-style: italic;
+        font-size: clamp(42px, 6.4vw, 92px);
+        font-weight: 400;
+        text-shadow: 0 3px 3px rgba(0, 0, 0, 0.14);
+      }
+      .hero-title strong {
+        font-size: clamp(34px, 5.2vw, 76px);
+        letter-spacing: -0.04em;
+      }
+      h1 {
+        margin: 0;
+        text-align: center;
+        letter-spacing: 0;
+        font-size: inherit;
+      }
+      .sub {
+        position: absolute;
+        left: 5%;
+        top: 38%;
+        width: 43%;
+        margin: 0;
+        color: #263342;
+        font-size: clamp(14px, 1.2vw, 18px);
+        line-height: 1.65;
+        letter-spacing: 0;
+      }
+      .welcome {
+        position: absolute;
+        left: 5%;
+        top: 29%;
+        width: 44%;
+        color: #151b24;
+        font-size: clamp(22px, 2.5vw, 36px);
+        font-weight: 400;
+        line-height: 1.2;
+      }
+      .grid {
+        position: absolute;
+        top: 37%;
+        right: 3%;
+        width: 44%;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: clamp(12px, 1.4vw, 20px);
+      }
+      .btn {
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 22px;
+        padding: 22px 14px;
+        min-height: clamp(120px, 16vh, 164px);
+        color: #151b24;
+        cursor: pointer;
+        text-align: center;
+        font: inherit;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        background: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.22);
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.16);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+      .btn:focus-visible,
+      .back:focus-visible,
+      .go:focus-visible {
+        outline: 3px solid #f4c914;
+        outline-offset: 3px;
+      }
+      .btn svg {
+        width: 48px;
+        height: 48px;
+        color: #5268c9;
+        stroke: #5268c9;
+      }
+      .btn b {
+        font-size: clamp(15px, 1.3vw, 19px);
+        letter-spacing: 0.01em;
+      }
+      .btn span {
+        font-size: 12px;
+        color: #475569;
+      }
+      .panel {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: #fff;
+        padding: clamp(18px, 4vw, 48px);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+        color: #111827;
+      }
+      .panel.on {
+        display: flex;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+        width: 100%;
+        justify-content: space-between;
+      }
+      .top h2 {
+        margin: 0;
+        text-align: center;
+        flex: 1;
+        font-size: clamp(18px, 3vw, 26px);
+      }
+      .back {
+        border: 0;
+        background: #5268c9;
+        color: #fff;
+        font-size: 16px;
+        padding: 12px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+      }
+      .c {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      .c h3 {
+        margin: 0 0 6px;
+      }
+      .c p {
+        margin: 0;
+        font-size: 14px;
+        color: #456;
+      }
+      .go {
+        display: inline-block;
+        margin-top: 12px;
+        background: #5268c9;
+        color: #fff;
+        text-decoration: none;
+        padding: 16px 26px;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        align-self: center;
+      }
+      .step {
+        border-left: 5px solid #2f6fe0;
+        background: #fff;
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+      }
+      .step b {
+        color: #2f6fe0;
+      }
+      #mapwrap {
+        background: #cfe8f7;
+        border-radius: 12px;
+        position: relative;
+        flex: 1;
+        min-height: 300px;
+      }
+      #mapwrap svg {
+        width: 100%;
+        height: 100%;
+        min-height: 300px;
+      }
+      .pin {
+        cursor: pointer;
+      }
+      #info {
+        margin-top: 10px;
+        background: #fff;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-size: 14px;
+        min-height: 44px;
+      }
+      .note {
+        font-size: 12px;
+        color: #789;
+        margin-top: 8px;
+      }
+      @media (max-width: 800px) {
+        body {
+          display: block;
+        }
+        .kiosk {
+          height: auto;
+          min-height: 100vh;
+          min-height: 100dvh;
+          padding: 100px 20px 32px;
+        }
+        .kiosk::before {
+          clip-path: polygon(100% 0, 100% 58%, 58% 42%);
+        }
+        .kiosk::after {
+          clip-path: polygon(100% 0, 100% 56%, 61% 41%);
+        }
+        .brand {
+          top: 18px;
+          left: 18px;
+        }
+        .hero-title {
+          top: 27px;
+          right: 18px;
+          gap: 5px;
+        }
+        .hero-title span {
+          font-size: clamp(23px, 6vw, 42px);
+        }
+        .hero-title strong {
+          font-size: clamp(20px, 5vw, 36px);
+        }
+        .welcome,
+        .sub,
+        .grid {
+          position: relative;
+          inset: auto;
+          width: 100%;
+        }
+        .welcome {
+          margin: 26px 0 8px;
+          font-size: clamp(24px, 7vw, 34px);
+        }
+        .sub {
+          margin-bottom: 24px;
+        }
+        .grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+        .btn {
+          min-height: 142px;
+          border-radius: 16px;
+        }
+        .btn svg {
+          width: 40px;
+          height: 40px;
+        }
+      }
+      @media (max-width: 440px) {
+        .hero-title {
+          top: 82px;
+          left: 18px;
+          right: auto;
+          color: #5268c9;
+        }
+        .hero-title span {
+          color: #f34f55;
+        }
+        .kiosk {
+          padding-top: 140px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .btn {
+          min-height: 116px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="kiosk" id="kiosk">
+      <div class="brand">
+        <img src="OTOP%20PH.png" alt="" />
+        <span>CALBAYOG CITY</span>
+      </div>
+      <div class="hero-title">
+        <span>Experience</span>
+        <h1><strong>Calbayog</strong></h1>
+      </div>
+      <div class="welcome">Discover Calbayog</div>
+      <div class="sub">
+        Explore local flavors, natural wonders, and city resources — all from
+        one place.
+      </div>
+      <div class="grid">
+        <button class="btn shop" data-p="shop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
+            <path d="M5 8h14l-1 12H6L5 8zM9 8a3 3 0 016 0" /></svg
+          ><b>SHOP CALBAYOG</b><span>Order your pasalubong online</span>
+        </button>
+        <button class="btn explore" data-p="explore">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
+            <path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.500 7 12 7 12z" />
+            <circle cx="12" cy="10" r="2.500" /></svg
+          ><b>EXPLORE CALBAYOG</b><span>Destinations and local stories</span>
+        </button>
+        <button class="btn road" data-p="road">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8">
+            <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg
+          ><b>OUR CITY ROADMAP</b><span>Smart &amp; Sustainable City 2025-2034</span>
+        </button>
+        <button class="btn digital" data-p="digital">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#fff"
+            stroke-width="1.8"
+          >
+            <rect x="3" y="4" width="18" height="12" rx="2" />
+            <path d="M8 20h8M12 16v4" /></svg
+          ><b>DIGITAL CALBAYOG</b><span>Interactive map of Calbayog</span>
+        </button>
+      </div>
+
+      <div class="panel" id="shop">
+        <div class="top">
+          <button class="back">&larr; Back</button>
+          <h2>Shop Calbayog</h2>
+        </div>
+        <a class="go" id="shoplink" href="#" target="_blank" rel="noopener"
+          >Open Shop Website</a
+        >
+      </div>
+
+      <div class="panel" id="explore">
+        <div class="top">
+          <button class="back">&larr; Back</button>
+          <h2>Explore Calbayog</h2>
+        </div>
+        <a
+          class="go"
+          id="tourlink"
+          style="background: #2faa6b"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          >Visit Tourism Page</a
+        >
+      </div>
+
+      <div class="panel" id="road">
+        <div class="top">
+          <button class="back">&larr; Back</button>
+          <h2>Smart &amp; Sustainable City Roadmap 2025-2034</h2>
+        </div>
+        <a
+          class="go"
+          id="roadlink"
+          style="background: #2f6fe0"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          >Open City Roadmap</a
+        >
+      </div>
+
+      <div class="panel" id="digital">
+        <div class="top">
+          <button class="back">&larr; Back</button>
+          <h2>Digital Calbayog &middot; Interactive Map</h2>
+        </div>
+        <a
+          class="go"
+          id="digitallink"
+          style="background: #3e5fd0"
+          href="#"
+          target="_blank"
+          rel="noopener"
+          >Open Digital Calbayog</a
+        >
+      </div>
+    </div>
+    <script>
+      const SHOP_URL = "https://emmanuelconarco-jpg.github.io/OTOP-Calbayog-Pasalubong-Center/";
+      const TOURISM_URL = "https://calbayog.gov.ph/city-waterfalls-2/";
+      const ROADMAP_URL = "https://calbayog.gov.ph/smart-city-road-map/";
+      const DIGITAL_URL = "https://calbayog.gov.ph/cim/";
+      const $ = (s) => document.querySelector(s),
+        all = (s) => document.querySelectorAll(s);
+      $("#shoplink").href = SHOP_URL;
+      $("#tourlink").href = TOURISM_URL;
+      $("#roadlink").href = ROADMAP_URL;
+      $("#digitallink").href = DIGITAL_URL;
+      let idle;
+      function home() {
+        all(".panel").forEach((p) => p.classList.remove("on"));
+      }
+      function reset() {
+        clearTimeout(idle);
+        if (all(".panel.on").length) idle = setTimeout(home, 60000);
+      }
+      all(".btn").forEach(
+        (b) =>
+          (b.onclick = () => {
+            $("#" + b.dataset.p).classList.add("on");
+            reset();
+          }),
+      );
+      all(".back").forEach((b) => (b.onclick = home));
+      ["click", "touchstart"].forEach((e) =>
+        document.addEventListener(e, reset),
+      );
+    </script>
+  </body>
+</html>
